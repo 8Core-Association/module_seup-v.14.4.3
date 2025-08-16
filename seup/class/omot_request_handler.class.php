@@ -23,8 +23,11 @@ class Omot_Request_Handler
      */
     public static function handleGenerateOmot($db, $conf, $user, $langs)
     {
+        // Clean all output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             $predmet_id = GETPOST('predmet_id', 'int');
