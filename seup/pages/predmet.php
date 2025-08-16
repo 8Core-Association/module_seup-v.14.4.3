@@ -49,62 +49,20 @@ if (!$res) {
     die("Include of main fails");
 }
 
-// Libraries
-require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
-
-// Local classes
-require_once __DIR__ . '/../class/predmet_helper.class.php';
-require_once __DIR__ . '/../class/request_handler.class.php';
-require_once __DIR__ . '/../class/omot_spisa_generator.class.php';
-require_once __DIR__ . '/../class/omot_auto_updater.class.php';
-require_once __DIR__ . '/../class/omot_helper.class.php';
-
-// Load translation files
-$langs->loadLangs(array("seup@seup"));
-
-// Get predmet ID
-$caseId = GETPOST('id', 'int');
-if (!$caseId) {
-    header('Location: predmeti.php');
-    exit;
-}
-
-// Handle POST requests
+// RANA DETEKCIJA AJAX ZAHTJEVA - PRIJE BILO ČEGA!
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = GETPOST('action', 'alpha');
     
-    // Handle document upload
-    if ($action === 'upload_document') {
-        Request_Handler::handleUploadDocument($db, '', $langs, $conf, $user);
-        
-        // Auto-generate omot after upload
-        $omotResult = Omot_Auto_Updater::onDocumentUpload($db, $conf, $user, $langs, $caseId, []);
-        if ($omotResult['success']) {
-            setEventMessages('Dokument uploadovan i omot ažuriran', null, 'mesgs');
-        }
-        
-        // Redirect to prevent form resubmission
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $caseId);
-        exit;
-    }
-    
-    // Handle omot generation
     if ($action === 'generate_omot') {
-        // Clean output buffer to prevent HTML contamination
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=UTF-8');
+        ob_end_clean();
         
         try {
+            require_once __DIR__ . '/../class/omot_spisa_generator.class.php';
             $generator = new Omot_Spisa_Generator($db, $conf, $user, $langs);
-            $filepath = $generator->generateOmotSpisa($caseId, 'F');
+            $filepath = $generator->generateOmotSpisa(GETPOST('predmet_id', 'int'), 'F');
             
             if ($filepath) {
-                // Create download URL
                 $filename = basename($filepath);
                 $download_url = DOL_URL_ROOT . '/custom/seup/class/download_temp_pdf.php?file=' . urlencode($filename);
                 
@@ -129,13 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     
-    // Handle document deletion
     if ($action === 'delete_document') {
-        // Clean output buffer to prevent HTML contamination
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=UTF-8');
+        ob_end_clean();
         
         $filename = GETPOST('filename', 'alpha');
         $filepath = GETPOST('filepath', 'alpha');
@@ -164,7 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($file_deleted && $db_deleted) {
                 // Auto-regenerate omot after deletion
-                $omotResult = Omot_Auto_Updater::onDocumentUpload($db, $conf, $user, $langs, $caseId, []);
+                require_once __DIR__ . '/../class/omot_auto_updater.class.php';
+                $omotResult = Omot_Auto_Updater::onDocumentUpload($db, $conf, $user, $langs, GETPOST('case_id', 'int'), []);
                 
                 echo json_encode([
                     'success' => true,
@@ -185,6 +140,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit;
     }
+}
+
+// Libraries
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+
+// Local classes
+require_once __DIR__ . '/../class/predmet_helper.class.php';
+require_once __DIR__ . '/../class/request_handler.class.php';
+require_once __DIR__ . '/../class/omot_spisa_generator.class.php';
+require_once __DIR__ . '/../class/omot_auto_updater.class.php';
+require_once __DIR__ . '/../class/omot_helper.class.php';
+
+// Load translation files
+$langs->loadLangs(array("seup@seup"));
+
+// Get predmet ID
+$caseId = GETPOST('id', 'int');
+if (!$caseId) {
+    header('Location: predmeti.php');
+    exit;
+}
+
+// Handle POST requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOST('action', 'alpha') === 'upload_document') {
+        Request_Handler::handleUploadDocument($db, '', $langs, $conf, $user);
+        
+        // Auto-generate omot after upload
+        require_once __DIR__ . '/../class/omot_auto_updater.class.php';
+        $omotResult = Omot_Auto_Updater::onDocumentUpload($db, $conf, $user, $langs, $caseId, []);
+        if ($omotResult['success']) {
+            setEventMessages('Dokument uploadovan i omot ažuriran', null, 'mesgs');
+        }
+        
+        // Redirect to prevent form resubmission
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $caseId);
+        exit;
 }
 
 // Fetch predmet details

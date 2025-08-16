@@ -67,32 +67,43 @@ if (!$user->admin) {
     accessforbidden();
 }
 
-// Handle AJAX requests
+// RANA DETEKCIJA AJAX ZAHTJEVA - ODMAH NA POČETKU!
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Clean output buffer for all AJAX requests
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
+    header('Content-Type: application/json; charset=UTF-8');
+    ob_end_clean();
     
     $action = GETPOST('action', 'alpha');
     
-    switch ($action) {
-        case 'batch_generate':
-            Omot_Request_Handler::handleBatchGenerate($db, $conf, $user, $langs);
-            break;
-        case 'get_statistics':
-            Omot_Request_Handler::handleOmotStatistics($db, $conf);
-            break;
-        case 'cleanup_omoti':
-            Omot_Request_Handler::handleCleanupOmoti($db, $conf);
-            break;
-        case 'update_auto_settings':
-            Omot_Request_Handler::handleUpdateAutoSettings($db, $conf);
-            break;
-        case 'validate_layout':
-            Omot_Request_Handler::handleValidateLayout();
-            break;
+    try {
+        switch ($action) {
+            case 'batch_generate':
+                require_once __DIR__ . '/../class/omot_request_handler.class.php';
+                Omot_Request_Handler::handleBatchGenerate($db, $conf, $user, $langs);
+                break;
+            case 'get_statistics':
+                require_once __DIR__ . '/../class/omot_request_handler.class.php';
+                Omot_Request_Handler::handleOmotStatistics($db, $conf);
+                break;
+            case 'cleanup_omoti':
+                require_once __DIR__ . '/../class/omot_request_handler.class.php';
+                Omot_Request_Handler::handleCleanupOmoti($db, $conf);
+                break;
+            case 'update_auto_settings':
+                require_once __DIR__ . '/../class/omot_request_handler.class.php';
+                Omot_Request_Handler::handleUpdateAutoSettings($db, $conf);
+                break;
+            case 'validate_layout':
+                require_once __DIR__ . '/../class/omot_request_handler.class.php';
+                Omot_Request_Handler::handleValidateLayout();
+                break;
+            default:
+                echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                break;
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     }
+    exit;
 }
 
 // Get current statistics

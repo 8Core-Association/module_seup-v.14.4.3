@@ -23,9 +23,6 @@ class Omot_Request_Handler
      */
     public static function handleGenerateOmot($db, $conf, $user, $langs)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             $predmet_id = GETPOST('predmet_id', 'int');
             $output_type = GETPOST('output_type', 'alpha') ?: 'F';
@@ -79,9 +76,6 @@ class Omot_Request_Handler
      */
     public static function handleBatchGenerate($db, $conf, $user, $langs)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             $predmet_ids = GETPOST('predmet_ids', 'array');
             $limit = GETPOST('limit', 'int') ?: 10;
@@ -141,9 +135,6 @@ class Omot_Request_Handler
      */
     public static function handlePreviewOmot($db, $conf, $user, $langs)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             $predmet_id = GETPOST('predmet_id', 'int');
             
@@ -183,9 +174,6 @@ class Omot_Request_Handler
      */
     public static function handleOmotStatistics($db, $conf)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             require_once __DIR__ . '/omot_spisa_generator.class.php';
             require_once __DIR__ . '/omot_auto_updater.class.php';
@@ -213,9 +201,6 @@ class Omot_Request_Handler
      */
     public static function handleCleanupOmoti($db, $conf)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             require_once __DIR__ . '/omot_helper.class.php';
             require_once __DIR__ . '/omot_auto_updater.class.php';
@@ -249,9 +234,6 @@ class Omot_Request_Handler
      */
     public static function handleUpdateAutoSettings($db, $conf)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             $auto_generate = GETPOST('auto_generate', 'int') ? '1' : '0';
             $auto_archive = GETPOST('auto_archive', 'int') ? '1' : '0';
@@ -288,9 +270,6 @@ class Omot_Request_Handler
      */
     public static function handleValidateOmot($db, $conf)
     {
-        header('Content-Type: application/json');
-        ob_end_clean();
-        
         try {
             $filepath = GETPOST('filepath', 'alpha');
             
@@ -320,12 +299,6 @@ class Omot_Request_Handler
      */
     public static function handleValidateLayout()
     {
-        // Clean all output buffers first
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        header('Content-Type: application/json');
-        
         try {
             require_once __DIR__ . '/omot_layout_helper.class.php';
             $validation = Omot_Layout_Helper::validateLayout();
