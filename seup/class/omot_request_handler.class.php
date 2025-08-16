@@ -249,11 +249,8 @@ class Omot_Request_Handler
      */
     public static function handleUpdateAutoSettings($db, $conf)
     {
-        // Clean all output buffers first
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
         header('Content-Type: application/json');
+        ob_end_clean();
         
         try {
             $auto_generate = GETPOST('auto_generate', 'int') ? '1' : '0';
@@ -291,8 +288,11 @@ class Omot_Request_Handler
      */
     public static function handleValidateOmot($db, $conf)
     {
+        // Clean all output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             $filepath = GETPOST('filepath', 'alpha');
