@@ -69,6 +69,11 @@ if (!$user->admin) {
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Clean output buffer for all AJAX requests
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
     $action = GETPOST('action', 'alpha');
     
     switch ($action) {

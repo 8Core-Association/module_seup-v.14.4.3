@@ -55,6 +55,11 @@ class Omot_Spisa_Generator
     public function generateOmotSpisa($predmet_id, $output_type = 'F')
     {
         try {
+            // Ensure clean environment for PDF generation
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            
             // Get predmet data
             $predmetData = $this->getPredmetData($predmet_id);
             if (!$predmetData) {

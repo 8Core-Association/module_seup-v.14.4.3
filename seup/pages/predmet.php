@@ -93,8 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Handle omot generation
     if ($action === 'generate_omot') {
+        // Clean output buffer to prevent HTML contamination
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             $generator = new Omot_Spisa_Generator($db, $conf, $user, $langs);
@@ -128,8 +131,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Handle document deletion
     if ($action === 'delete_document') {
+        // Clean output buffer to prevent HTML contamination
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         $filename = GETPOST('filename', 'alpha');
         $filepath = GETPOST('filepath', 'alpha');
