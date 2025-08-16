@@ -183,11 +183,8 @@ class Omot_Request_Handler
      */
     public static function handleOmotStatistics($db, $conf)
     {
-        // Clean all output buffers first
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
         header('Content-Type: application/json');
+        ob_end_clean();
         
         try {
             require_once __DIR__ . '/omot_spisa_generator.class.php';
@@ -252,8 +249,11 @@ class Omot_Request_Handler
      */
     public static function handleUpdateAutoSettings($db, $conf)
     {
+        // Clean all output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             $auto_generate = GETPOST('auto_generate', 'int') ? '1' : '0';
