@@ -79,11 +79,8 @@ class Omot_Request_Handler
      */
     public static function handleBatchGenerate($db, $conf, $user, $langs)
     {
-        // Clean all output buffers first
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
         header('Content-Type: application/json');
+        ob_end_clean();
         
         try {
             $predmet_ids = GETPOST('predmet_ids', 'array');
@@ -186,8 +183,11 @@ class Omot_Request_Handler
      */
     public static function handleOmotStatistics($db, $conf)
     {
+        // Clean all output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             require_once __DIR__ . '/omot_spisa_generator.class.php';
