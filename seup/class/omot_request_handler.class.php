@@ -288,11 +288,8 @@ class Omot_Request_Handler
      */
     public static function handleValidateOmot($db, $conf)
     {
-        // Clean all output buffers first
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
         header('Content-Type: application/json');
+        ob_end_clean();
         
         try {
             $filepath = GETPOST('filepath', 'alpha');
@@ -323,8 +320,11 @@ class Omot_Request_Handler
      */
     public static function handleValidateLayout()
     {
+        // Clean all output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         header('Content-Type: application/json');
-        ob_end_clean();
         
         try {
             require_once __DIR__ . '/omot_layout_helper.class.php';
